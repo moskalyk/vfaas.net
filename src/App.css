@@ -42,11 +42,6 @@
   color: #888;
 }
 
-.who {
-  transition: color 1s linear;
-  color: grey;
-}
-
 .cloud {
   visibility: visible;
   opacity: 0 !important;
