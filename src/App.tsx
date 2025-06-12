@@ -109,6 +109,7 @@ class VFAAS {
       <p className={cloud ? 'cloud': ''} style={{opacity: 1}}>☁︎ there is no cloud </p>
       <br/>
       <p>$ wget vfaas.net/cli && chmod +x ./cli && ./cli</p>
+      <p>(note: community hosting is down for maintenance until possibly july 2025)</p>
       <br/>
       <p className='why'>why  &nbsp;? &nbsp;⚔︎ &nbsp;friends, agents, and what blockchains need</p>
       <p className='what'>what ? &nbsp;✱ &nbsp;composable serverless js functions & kv storage</p>
