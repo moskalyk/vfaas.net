@@ -114,7 +114,7 @@ class VFAAS {
       <p className='why'>why  &nbsp;? &nbsp;⚔︎ &nbsp;friends, agents, and what blockchains need</p>
       <p className='what'>what ? &nbsp;✱ &nbsp;composable serverless js functions & kv storage</p>
       <p className='how'>how  &nbsp;? &nbsp;☈ &nbsp;replicated data, pinball protocol, & timeouts</p>
-      <p className='who'>who  &nbsp;? &nbsp;∴ &nbsp;ens named linked nets</p>
+      <p className='who'>who  &nbsp;? &nbsp;∴ &nbsp;named data networking</p>
       <p className='when'>when ? &nbsp;⚯ (future) p2p communication phase</p>
       <p className='where'>where? &nbsp;♖ &nbsp;at home</p>
       <br/>
