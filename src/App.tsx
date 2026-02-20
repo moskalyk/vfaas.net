@@ -112,7 +112,7 @@ class VFAAS {
       <p>(note: community hosting is down for maintenance until possibly july 2025)</p>
       <br/>
       <p className='why'>why  &nbsp;? &nbsp;⚔︎ &nbsp;friends, agents, and what blockchains need</p>
-      <p className='what'>what ? &nbsp;✱ &nbsp;composable serverless js functions & kv storage</p>
+      <p className='what'>what ? &nbsp;✱ &nbsp;composable deployed function interfaces (DFIs) & kv storage</p>
       <p className='how'>how  &nbsp;? &nbsp;☈ &nbsp;replicated data, pinball protocol, & timeouts</p>
       <p className='who'>who  &nbsp;? &nbsp;∴ &nbsp;named data networking</p>
       <p className='when'>when ? &nbsp;⚯ (future) p2p communication phase</p>
