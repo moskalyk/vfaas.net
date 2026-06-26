@@ -1,0 +1,20 @@
+body {
+    font-family: 'Courier';
+    color: #454040;
+    font-size: 18px;
+}
+
+.standing {
+    display: flex;
+    justify-content: center;
+}
+
+.cli {
+    display: flex;
+}
+
+.cloud {
+  visibility: visible;
+  opacity: 0 !important;
+  transition: opacity 2s linear;
+}

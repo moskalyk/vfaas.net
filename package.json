@@ -1,29 +1,29 @@
 {
   "name": "vfaas.net",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "version": "1.0.0",
+  "description": "%very-fast-as-a-service software suite home",
+  "main": "index.js",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "pre:build": "node compiler/index.js",
+    "watch": "node liveReload/index.js",
+    "start": "npm run pre:build && npx serve .",
+    "test": "node tests/index.test.js"
   },
-  "dependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+  "repository": {
+    "type": "git",
+    "url": "github.com/moskalyk/vfaas.net"
   },
-  "devDependencies": {
-    "@eslint/js": "^9.22.0",
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
-    "@vitejs/plugin-react": "^4.3.4",
-    "eslint": "^9.22.0",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.19",
-    "globals": "^16.0.0",
-    "typescript": "~5.7.2",
-    "typescript-eslint": "^8.26.1",
-    "vite": "^6.3.1"
-  }
+  "keywords": [
+    "uncensored",
+    "compute",
+    "ai",
+    "faas",
+    "p2p",
+    "replicated",
+    "data",
+    "dfi",
+    "kv"
+  ],
+  "author": "~zod",
+  "license": "Apache-2.0"
 }

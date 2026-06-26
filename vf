@@ -1,0 +1,169 @@
+#!/usr/bin/env node
+const argv = process.argv;
+const fs = require('fs');
+const util = require("node:util");
+const { generateKeyPairSync } = require('crypto');
+const exec = util.promisify(require("node:child_process").exec);
+
+(async () => {
+    console.log('    >:)    ')
+    console.log(`versus faas`)
+    console.log('')
+    console.log('  init \t\t<filePath>\t\tinitialize a function from a directory')
+    console.log('  key-gen\t<keyPhrase> <force>\tgenerate a key with a phrase, and if forced overwriten')
+    console.log('  local\t\t<filePath> <functionName> <args>\trun a local function without a db')
+    console.log('  write\t\t<bundleID>\twrite a function to the subnet with a bundle ID')
+    console.log('  list\t\t\t\tlist written bundleIDs')
+    console.log('  del\t\t<bundleID>\tdelete a bundleID')
+    console.log()
+    
+    const code = 
+`module.exports.serverless = async function () {
+
+};`
+    
+    switch(argv[2]){
+        case 'init':
+            const filePath = argv[4]
+            if(!filePath) throw new Error('include a file path with --filePath')
+            const initPromise = () => new Promise(async (res) => {
+                if (fs.existsSync(filePath+'/code/')) {
+                    const fileName = Math.floor(Math.random() * 1000000)
+                    await fs.writeFileSync(filePath+'/code/'+`${fileName}.js`, code, {encoding:'utf8',flag:'a'})
+                    console.log('success')
+                    res()
+                }else {
+                  console.log(__dirname+'/src/')
+                  fs.mkdir(filePath+'/code/',
+                  async (err) => {
+                    if (err) {
+                        return console.error(err);
+                    }
+                    const fileName = Math.floor(Math.random() * 1000000)
+                    await fs.writeFileSync(filePath+'/code/'+`${fileName}.js`, code, {encoding:'utf8',flag:'a'})
+                    console.log('success')
+                        res()
+                    })
+                }
+            })
+            await initPromise()
+            break;
+        case 'key-gen':
+        
+            // get dirname
+            const keyPhrase = argv[3]
+            const force = argv[5]
+            
+            // if exists, print
+            const {
+              publicKey,
+              privateKey,
+            } = generateKeyPairSync('rsa', {
+              modulusLength: 4096,
+              publicKeyEncoding: {
+                type: 'spki',
+                format: 'pem',
+              },
+              privateKeyEncoding: {
+                type: 'pkcs8',
+                format: 'pem',
+                cipher: 'aes-256-cbc',
+                passphrase: keyPhrase,
+              },
+            });
+
+            const versusPath = __dirname+'/.versus'
+            if (fs.existsSync(versusPath) && Boolean(force)) {
+                const yaStr = publicKey
+                fs.writeFile(versusPath, yaStr, {encoding:'utf8',flag:'w'}, async () => {
+                    console.log('added again')
+                })
+            } else {
+                // if doesn't exist, create file and add
+                const yaStr = publicKey
+                fs.writeFile(versusPath, yaStr, {encoding:'utf8',flag:'w'}, async () => {
+                    console.log('addded')
+                })
+            }
+            break;
+
+        case 'local':
+            const filepath = argv[3]
+            const functionName = argv[4]
+            const args = argv[5]
+            let cmd
+            
+            if(args && args.length>0){
+              cmd =  `node -e 'require("${filepath}").${functionName}(${args.split(',')})'`
+            }else {
+              cmd =  `node -e 'require("${filepath}").${functionName}()'`
+            }
+
+            const { error, stdout, stderr } = await exec(cmd);
+            console.log(stdout)
+            break;
+
+        case 'write':
+            const fp = argv[3]
+
+            const runWrite = async (body) => {
+                const res = await fetch(`http://localhost:3000/write`, {
+                    method: 'post',
+                    body: JSON.stringify({ msg: body })
+                });
+                const val = await res.json()
+                return val
+            };
+            const promise = () => new Promise((res) => {
+                fs.readFile(fp , async (err, data) => {
+                    const writingObj = {
+                        // origins: origins.split(','), TODO: origins
+                        code: JSON.stringify(data.toString()),
+                        author: 'nero',
+                        bundleID: fp.split('/')[fp.split('/').length -1 ].split('.js')[0]
+                    }
+                    console.log(await runWrite(writingObj))
+                    res()
+                })
+            })
+            await promise();
+            break;
+
+        case 'list':
+            const author = argv[3]
+
+            const runList = async (author) => {
+                const res = await fetch(`http://localhost:3000/list`, {
+                    method: 'post',
+                    body: JSON.stringify({ author: author })
+                });
+                const val = await res.json()
+                return val
+            };
+            console.log(' BundleID  |   Author')
+            console.log('-----------|-----------')
+            let output = ''
+            const list = await runList(author)
+            Object.keys(list.val).map((el) => {
+                output += " " + el.split(':')[1] + '\t      ' + el.split(':')[0] + '\n'
+            })
+            console.log(output)
+            break;
+
+        case 'del':
+            const auth = argv[3]
+            const bundleID = argv[4]
+
+            const runDel = async (auth, bundleID) => {
+                const res = await fetch(`http://localhost:3000/delete`, {
+                    method: 'post',
+                    body: JSON.stringify({ author: auth, bundleID })
+                });
+                const val = await res.json()
+                return val
+            };
+            
+            await runDel(auth, bundleID)
+            break;
+    }
+})()
