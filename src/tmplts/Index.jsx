@@ -1,3 +1,7 @@
+const Reason = require('./Reason.jsx')
+const ReasonClicker = require('./ReasonClicker.jsx')
+const ReasonWhere = require('./ReasonWhere.jsx')
+
 class Index extends EventTarget {
 	constructor(){
 		super()
@@ -10,7 +14,7 @@ class Index extends EventTarget {
         console.log('clicked')
 	}
 	
-	async view() {
+	async view(args) {
 		return <>
 		<br/>
 		<br/>
@@ -27,13 +31,13 @@ class Index extends EventTarget {
 				<div class='cli'>
 					<p style='cursor:pointer;'onclick="(() => navigator.clipboard.writeText('wget vfaas.net/vf && node vf'))()">$ wget vfaas.net/vf && node vf</p>
 				</div>
-                <p class='why'>why  &nbsp;? &nbsp;⚔︎ &nbsp;friends, agents, and what blockchains need</p>
-				<p class='what'>what ? &nbsp;✱ &nbsp;composable deployed function interfaces (DFIs) & kv storage</p>
-				<p class='how'>how  &nbsp;? &nbsp;☈ &nbsp;replicated data, pinball protocol, & timeouts</p>
-				<p class='who' style='cursor:pointer;' onclick="alert('via mixed-folder-messages (mfm)')">who  &nbsp;? &nbsp;<span style="font-size:21.4px">∴</span> &nbsp;named data networking</p>
-				<p class='when'>when ? &nbsp;⚯ &nbsp;p2p communication phasing</p>
-				<p class='huh'>huh  &nbsp;? &nbsp;☢ &nbsp;tricr test runner frmwrk (i.e. i, ive, ill)</p>
-				<p class='where'>where? &nbsp;<img src="./src/assets/usb-symbol.svg"/> &nbsp;off-usb hub-spoke</p>
+				<Reason key={1} reason={'why'} explainer={'&nbsp;? &nbsp;⚔︎ &nbsp;friends, agents, and what blockchains need'}/>
+				<Reason key={2} reason={'what'} explainer={'? &nbsp;✱ &nbsp;composable deployed function interfaces (DFIs) & kv storage'}/>
+				<Reason key={3} reason={'how'} explainer={'&nbsp;? &nbsp;☈ &nbsp;replicated data, pinball protocol, & timeouts'}/>
+				<ReasonClicker key={4} reason={'who'} fontSize={21.4} explainerHalf1={'&nbsp;? &nbsp;'} symbol={'∴'} explainerHalf2={'&nbsp;named data networking'}/>
+				<Reason key={5} reason={'when'} explainer={'? &nbsp;⚯ &nbsp;p2p communication phasing'}/>
+				<Reason key={6} reason={'huh'} explainer={'  &nbsp;? &nbsp;☢ &nbsp;tricr test runner frmwrk (i.e. i, ive, ill)'}/>
+				<ReasonWhere key={8} reason={'where'} explainer={'&nbsp;off-usb hub-spoke'}/>
 			</div>
 		</div>
 		</>

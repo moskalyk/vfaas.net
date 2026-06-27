@@ -52,11 +52,10 @@ const setupClickHandlers = () => {
         composedComponents[packagesMatched.groups.component] = {
             rawPackage: packagesMatched.groups.package,
             c: [],
-            components: []
+            components: {}
         }
     }
     
-    console.log(composedComponents)
     
     // build compilation tree
     let writtenFile = anchorContents.replace('#', indexContents.toString()).replace('module.exports = Index', '').replace('<>','\\`').replace('</>','\\`')
@@ -69,23 +68,17 @@ const setupClickHandlers = () => {
         writtenFile = writtenFile.replace('#', requiredLoading.toString()).replace('module.exports = ' + k, '').replace('<>','\\`').replace('</>','\\`')
         writtenFile = writtenFile.replace(`const ${k} = require('${composedComponents[k].rawPackage}')`,'' )
         
-        // skittle a member and get arguments
-        // add to template
-        // append to array
         const re = /\<(?<component>[A-Z]+.+)\b(\s.+={.+})\/\>?/gm
         
         const matches1 = writtenFile.matchAll(re);
         for (const match of matches1) {
-          // console.log(match);
-          // console.log(match.index)
-          composedComponents[match[1]].c.push(match[0])
-          // break;
+          console.log(match);
+          if(!composedComponents[match.groups.component].c.includes(match[0])){
+              composedComponents[match.groups.component].c.push(match[0])
+
+          }
         }
-        
-        // composedComponents[s.groups.component] = {
-        //     rawComponent: s[0],
-        //     ...composedComponents[s.groups.component]
-        // }
+
 
         const membersRegex = /((?<key>\S+)={(.+?)})/g
         let keys = []
@@ -93,56 +86,56 @@ const setupClickHandlers = () => {
             for(const c of composedComponents[k].c){
                 const matches2 = c.trim().matchAll(membersRegex);
                 for (const match of matches2) {
-                    console.log('k')
                     if(match[2] == 'key') keys.push(match[3])
                 }
             }
         })
-                        let i =0
+        let i =0
+        
+        let count = 0
+        
+        keys.map((key) => {
 
-        Object.keys(composedComponents).map((k) => {
-            for(const c of composedComponents[k].c){
-                const matches2 = c.trim().matchAll(membersRegex);
+            Object.keys(composedComponents).map((k) => {
+                let i = 0;
                 const arguments = []
-                for (const match of matches2) {
-                  console.log(match);
-                  if(match.groups.key != 'key') {
-                      arguments.push([match[2],match[3]])
-                      const obj = {}
-                      obj[keys[i++]] = arguments
-                    composedComponents[k].components = [...composedComponents[k].components, obj]
-                  }
+                for(const c of composedComponents[k].c) {
+                    const matches2 = c.trim().matchAll(membersRegex);
+                    for (const match of matches2) {
+                        arguments.push([match[2],match[3]])
+                    }
                 }
-            }
+                
+                let keyIncr = false
+                let index = 0
+                for(let i = 0; i < arguments.length; i++) {
+                    if(arguments[i][0] == 'key') {
+                        index = arguments[i][1]
+                        if(keyIncr) keyIncr = false
+                        else keyIncr = true
+                        
+                    }
+                    
+                    if(keyIncr == false && key == index){
+                        keyIncr = true
+                    }
+                    if(keyIncr && key == index){
+                        if(composedComponents[k].components[key]) composedComponents[k].components[key].push(arguments[i])
+                        else composedComponents[k].components[key] = []
+                    }
+                }
+            })
         })
-        
-        
-        // const arguments = []
-        // for (const match of matches2) {
-        //   console.log(match);
-        //   arguments.push(match[3])
-        //   console.log(match.index)
-        // }
-        
-        // varsString += `let ${k.toLowerCase()}${Date.now()} = await (new ${k}(${arguments.toString()})).view();\n`
-        
+
         // await setupClickHandlers()
     }
     
-    console.log(JSON.stringify(composedComponents))
     let index = 0;
     Object.entries(composedComponents).map(([k,v]) => {
-        console.log(k)
-        console.log(v)
-        v.components.map((c) => {
-            console.log(c)
-            Object.values(c).forEach((v) => {
-            console.log(v)
-                varsString += `let ${k.toLowerCase()}${index++} = await (new ${k}(${v[0][1]})).view();\n`
-            })
-
+        Object.entries(v.components).map(([keys, members]) => {
+                const args = members.map((args) => args[1])
+                varsString += `let ${k.toLowerCase()}${index++} = await (new ${k}(${args.toString()}));\n`
         })
-
     })
 
     const str = writtenFile;
@@ -155,25 +148,22 @@ const setupClickHandlers = () => {
     writtenFile = `${s1}\n\t\t${str1}${s2}`;
     let j=0
     for(let c in composedComponents){
-    console.log('-------')
-    console.log(c)
-    console.log(composedComponents[c].c)
         for(let k of composedComponents[c].c){
-            console.log(k)
             const string = writtenFile 
-            const stringToAdd = `main = main.replaceAll("${k}", ${c.toLowerCase()+j++})`;
+            const stringToAdd = `main = main.replaceAll("${k}", await ${c.toLowerCase()+j}.view((await ${c.toLowerCase()+j++}.publicMembers())[0]))`;
+
             const index = writtenFile.indexOf('let main = contents;') + 'let main = contents;'.length;
             const s_1 = string.slice(0, index);
             const s_2 = string.slice(index);
             writtenFile = `${s_1}\n\t\t${stringToAdd}${s_2}`;
+
         }
     }
+    
 
     // clean up sign anchors
     writtenFile = writtenFile.replace('#', '')
     writtenFile = writtenFile.replace('&)', '')
-    
-    
     
     // write to index
     await writeFile('./index.js', writtenFile)

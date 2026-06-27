@@ -8,7 +8,6 @@ function runner() {
 		const element = document.getElementById('anchor');
 		let main = contents;
 		element.setHTMLUnsafe(main);
-		
 		&)
 	})();
 `)
